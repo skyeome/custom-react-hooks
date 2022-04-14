@@ -1,30 +1,35 @@
 import { useState } from "react";
 
-const useInput = (initialValue, validator)=>{
-  //true일때만 value값이 바뀌어야 한다.
-  let willUpdate = true;
-  const [value, setValue] = useState(initialValue);
-  const onChange = (event) => {
-    const {
-      target: {value}
-    } = event;
-    //validator라는 함수가 넘어오면 그 함수에서 전달해주는 값에 따라
-    //willUpdate가 변경되어야 한다.
-    if(typeof validator === "function") willUpdate = validator(value);
-    //willUpdate가 true일때만 input의 value를 바꾼다.
-    if(willUpdate) setValue(value);
+const content = [
+  {
+    tab:"Section 1",
+    content:"I'm the content of Section 1"
+  },
+  {
+    tab:"Section 2",
+    content:"I'm the content of Section 2"
   }
-  return { value, onChange };
-}
+];
+
+const useTab = (initialIndex, tabArray)=>{
+  const [currentIndex, setCurrentIndex] = useState(initialIndex);
+  //tabArray가 제공되지 않으면 함수가 실행안되게 강제종료
+  if(!tabArray || !Array.isArray(tabArray)) return;
+  return {
+    currentItem: tabArray[currentIndex],
+    changeCurrentIndex: setCurrentIndex
+  }
+};
 
 function App() {
-  //글자수가 10자 이하일때는 true를 리턴한다.
-  const chkLen = (value) => value.length <= 10;
-  const name = useInput("Mr.",chkLen);
+  const {currentItem,changeCurrentIndex} = useTab(0,content);
+
   return (
     <div className="App">
-      <h1>Hello</h1>
-      <input type="text" placeholder="Name" {...name} />
+      {content.map((section,idx)=><button onClick={()=>changeCurrentIndex(idx)}>{section.tab}</button>)}
+      <div>
+        {currentItem.content}
+      </div>
     </div>
   );
 }
